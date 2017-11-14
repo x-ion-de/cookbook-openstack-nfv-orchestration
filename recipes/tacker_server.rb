@@ -45,12 +45,10 @@ end
 
 #------------------------------------------------------------------------------
 apt_update ''
-package 'git'
 package 'python-pip'
 package 'virtualenv'
 package 'python-dev'
 package 'libmysqlclient-dev'
-package 'tmux'
 package 'libffi-dev'
 package 'libssl-dev'
 #------------------------------------------------------------------------------
