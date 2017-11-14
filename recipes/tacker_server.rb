@@ -99,22 +99,27 @@ template tacker_conf_path do
 end
 
 #------------------------------------------------------------------------------
+tacker_server_version = node['openstack-nfv-orchestration']['tacker_server_version']
 
-directory pyenv_dir do
-  recursive true
-  owner 'root'
-  group 'root'
-  mode 0755
+python_runtime '2'
+
+python_virtualenv pyenv_dir
+
+python_package 'tacker' do
+  version tacker_server_version
+  notifies :run, 'execute[tacker-db-manage upgrade head]', :immediately
+  # Add tacker.vim_ping_action to mistral
+  notifies :run, 'execute[mistral-db-manage_populate]', :immediately
+  notifies :restart, 'service[mistral-api]', :immediately
+  notifies :restart, 'service[mistral-engine]', :immediately
+  notifies :restart, 'service[mistral-executor]', :immediately
+  notifies :run, 'execute[openstack-dashboard collectstatic]'
 end
 
-execute 'install_tacker' do
-  cwd pyenv_dir
-  command "virtualenv #{pyenv_dir} --system-site-packages && . #{pyenv_dir}/bin/activate && pip install tacker==0.8.0 && pip install heat-translator && tacker-db-manage --config-file /usr/local/pyenv/tacker/etc/tacker/tacker.conf upgrade head"
-  # Add tacker.vim_ping_action to mistral
-  notifies :run, 'execute[mistral-db-manage_populate]', :immediate
-  notifies :restart, 'service[mistral-api]', :immediate
-  notifies :restart, 'service[mistral-engine]', :immediate
-  notifies :restart, 'service[mistral-executor]', :immediate
+tdm_cmd = File.join(pyenv_dir, 'bin/tacker-db-manage')
+execute 'tacker-db-manage upgrade head' do
+  command "#{tdm_cmd} --config-file #{tacker_conf_path} upgrade head"
+  action :nothing
 end
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # TODO: replace policy file edits via sed with something better
