@@ -117,12 +117,6 @@ execute 'install_tacker' do
   notifies :restart, 'service[mistral-engine]', :immediate
   notifies :restart, 'service[mistral-executor]', :immediate
 end
-
-# Should not be necessary, already done above
-execute 'mistral-db-manage_populate' do
-  command "mistral-db-manage --config-file /etc/mistral/mistral.conf populate"
-end
-
 #------------------------------------------------------------------------------
 # Install systemd service file and start service
 execute 'daemon-reload' do
