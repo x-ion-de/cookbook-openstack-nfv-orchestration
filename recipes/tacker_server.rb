@@ -117,9 +117,23 @@ end
   python_package pkg
 end
 
+# Use links to make files in tacker virtual environment available to mistral
+distinfo = "tacker-#{tacker_server_version}.dist-info"
+link 'distinfo_dir' do
+  target_file "/usr/local/lib/python2.7/dist-packages/#{distinfo}"
+  to "#{pyenv_dir}/lib/python2.7/site-packages/#{distinfo}"
+end
+
+link 'tacker_dir' do
+  target_file '/usr/local/lib/python2.7/dist-packages/tacker'
+  to "#{pyenv_dir}/lib/python2.7/site-packages/tacker"
+end
+
 python_package 'tacker' do
   version tacker_server_version
   notifies :run, 'execute[tacker-db-manage upgrade head]', :immediately
+  notifies :create, 'link[distinfo_dir]', :immediately
+  notifies :create, 'link[tacker_dir]', :immediately
   # Add tacker.vim_ping_action to mistral
   notifies :run, 'execute[mistral-db-manage_populate]', :immediately
   notifies :restart, 'service[mistral-api]', :immediately
