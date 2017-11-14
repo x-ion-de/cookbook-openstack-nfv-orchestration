@@ -8,8 +8,6 @@ class ::Chef::Recipe
   include ::Openstack # address_for, get_password
 end
 
-include_recipe 'openstack-workflow::mistral-server'
-
 pyenv_dir = node['openstack-nfv-orchestration']['pyenv_dir']
 
 config_dir = File.join(pyenv_dir, 'etc/tacker')
