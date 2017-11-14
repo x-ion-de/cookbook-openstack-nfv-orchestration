@@ -18,29 +18,29 @@ db_user = node['openstack']['db']['nfv-orchestration']['username']
 db_pass = get_password('db', 'tacker')
 
 #------------------------------------------------------------------------------
-tacker_user = 'tacker'
-tacker_group = 'tacker'
+tacker_system_user = 'tacker'
+tacker_system_group = 'tacker'
 
-group tacker_group
+group tacker_system_group
 
-user tacker_user do
+user tacker_system_user do
   shell '/usr/sbin/nologin'
-  gid tacker_group
+  gid tacker_system_group
   comment 'OpenStack tacker'
   system true
   manage_home false
 end
 
 directory '/var/log/tacker' do
-  owner tacker_user
-  group tacker_group
+  owner tacker_system_user
+  group tacker_system_group
   mode 0750
 end
 
 # State directory for vim/fernet_keys
 directory '/etc/tacker' do
-  owner tacker_user
-  group tacker_group
+  owner tacker_system_user
+  group tacker_system_group
   mode 0750
 end
 
@@ -80,8 +80,8 @@ tacker_conf = merge_config_options 'nfv-orchestration'
 
 directory config_dir do
   recursive true
-  owner tacker_user
-  group tacker_group
+  owner tacker_system_user
+  group tacker_system_group
   mode 0700
 end
 
@@ -135,8 +135,8 @@ template '/etc/systemd/system/tacker-server.service' do
   mode 0644
   variables(
     name: 'tacker-server',
-    tacker_user: tacker_user,
-    tacker_group: tacker_group,
+    tacker_user: tacker_system_user,
+    tacker_group: tacker_system_group,
     tacker_conf_file: '/usr/local/pyenv/tacker/etc/tacker/tacker.conf',
 
     executable: File.join(pyenv_dir, '/bin/python2.7') + ' /usr/local/pyenv/tacker/bin/tacker-server'
@@ -152,8 +152,8 @@ template '/etc/systemd/system/tacker-conductor.service' do
   mode 0644
   variables(
     name: 'tacker-conductor',
-    tacker_user: tacker_user,
-    tacker_group: tacker_group,
+    tacker_user: tacker_system_user,
+    tacker_group: tacker_system_group,
     tacker_conf_file: '/usr/local/pyenv/tacker/etc/tacker/tacker.conf',
 
     executable: File.join(pyenv_dir, '/bin/python2.7') + ' /usr/local/pyenv/tacker/bin/tacker-conductor'
