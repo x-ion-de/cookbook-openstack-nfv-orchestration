@@ -16,4 +16,9 @@ default['openstack']['nfv-orchestration']['conf'].tap do |conf|
   conf['keystone_authtoken']['project_name'] = 'service'
   conf['keystone_authtoken']['user_domain_name'] = 'Default'
   conf['keystone_authtoken']['project_domain_name'] = 'Default'
+
+  # [oslo_policy] section
+  conf['oslo_policy']['policy_file'] = File.join(
+    node['openstack-nfv-orchestration']['pyenv_dir'], 'etc/tacker/policy.json'
+  )
 end
