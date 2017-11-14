@@ -25,9 +25,6 @@ service_role = node['openstack']['nfv-orchestration']['service_role']
 service_project =
   node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['project_name']
 
-service_domain_name =
-  node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['user_domain_name']
-
 region = node['openstack']['region']
 admin_user = node['openstack']['identity']['admin_user']
 admin_pass = get_password 'user', admin_user
@@ -64,6 +61,11 @@ openstack_project service_project do
   connection_params connection_params
 end
 
+advanced_services_role = 'advsvc'
+openstack_role advanced_services_role do
+  connection_params connection_params
+end
+
 # Register Service User
 openstack_user service_user do
   project_name service_project
@@ -79,11 +81,10 @@ openstack_user service_user do
   action :grant_role
 end
 
-# Grant default domain to user with role of Service Project
+# Grant Advanced Service role to Service User for Service Project
 openstack_user service_user do
-  domain_name service_domain_name
-  role_name service_role
-  user_name service_user
+  role_name advanced_services_role
+  project_name service_project
   connection_params connection_params
-  action :grant_domain
+  action :grant_role
 end
