@@ -129,39 +129,26 @@ execute 'Allow users in non-admin projects with admin roles to create flavors.' 
   command "sudo sed -i.bak 's|\"#{flavor_key}.*|\"#{flavor_key}\": \"role:admin\",|' /etc/heat/policy.json"
   not_if "grep '#{flavor_key}.*role:admin' " '/etc/heat/policy.json'
 end
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Install systemd service file and start service
+%w(server conductor).each do |unit|
+  template "/etc/systemd/system/tacker-#{unit}.service" do
+    source 'systemd-tacker.service.erb'
+    owner 'root'
+    group 'root'
+    mode 0644
+    variables(
+      name: "tacker-#{unit}",
+      tacker_user: tacker_system_user,
+      tacker_group: tacker_system_group,
+      tacker_conf_file: "#{pyenv_dir}/etc/tacker/tacker.conf",
 
-template '/etc/systemd/system/tacker-server.service' do
-  source 'systemd-tacker.service.erb'
-  owner 'root'
-  group 'root'
-  mode 0644
-  variables(
-    name: 'tacker-server',
-    tacker_user: tacker_system_user,
-    tacker_group: tacker_system_group,
-    tacker_conf_file: '/usr/local/pyenv/tacker/etc/tacker/tacker.conf',
-
-    executable: File.join(pyenv_dir, '/bin/python2.7') + ' /usr/local/pyenv/tacker/bin/tacker-server'
-  )
-  notifies :run, 'execute[daemon-reload]', :immediately
-  notifies :restart, 'service[tacker-server]', :delayed
-end
-
-template '/etc/systemd/system/tacker-conductor.service' do
-  source 'systemd-tacker.service.erb'
-  owner 'root'
-  group 'root'
-  mode 0644
-  variables(
-    name: 'tacker-conductor',
-    tacker_user: tacker_system_user,
-    tacker_group: tacker_system_group,
-    tacker_conf_file: '/usr/local/pyenv/tacker/etc/tacker/tacker.conf',
-
-    executable: File.join(pyenv_dir, '/bin/python2.7') + ' /usr/local/pyenv/tacker/bin/tacker-conductor'
-  )
-  notifies :run, 'execute[daemon-reload]', :immediately
-  notifies :restart, 'service[tacker-conductor]', :delayed
+      executable: File.join(pyenv_dir, '/bin/python2.7') +
+                  " #{pyenv_dir}/bin/tacker-#{unit}"
+    )
+    notifies :run, 'execute[daemon-reload]', :immediately
+    notifies :restart, "service[tacker-#{unit}]", :delayed
+  end
 end
 
 service 'tacker-server' do
