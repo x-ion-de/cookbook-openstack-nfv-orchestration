@@ -7,6 +7,7 @@
 #------------------------------------------------------------------------------
 
 package 'python-pip'
+pyenv_dir = node['openstack-nfv-orchestration']['pyenv_dir']
 #------------------------------------------------------------------------------
 # Install tacker-horizon
 tacker_horizon_version = node['openstack-nfv-orchestration']['tacker_horizon_version']

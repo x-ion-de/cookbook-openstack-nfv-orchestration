@@ -10,7 +10,10 @@ end
 
 include_recipe 'openstack-workflow::mistral-server'
 
-config_dir = '/usr/local/pyenv/tacker/etc/tacker'
+pyenv_dir = node['openstack-nfv-orchestration']['pyenv_dir']
+
+config_dir = File.join(pyenv_dir, 'etc/tacker')
+
 tacker_conf_path = File.join(config_dir, 'tacker.conf')
 
 db_user = node['openstack']['db']['nfv-orchestration']['username']
@@ -98,8 +101,6 @@ template tacker_conf_path do
 end
 
 #------------------------------------------------------------------------------
-
-pyenv_dir = '/usr/local/pyenv/tacker'
 
 directory pyenv_dir do
   recursive true
