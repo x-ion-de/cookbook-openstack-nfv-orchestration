@@ -8,6 +8,10 @@ class ::Chef::Recipe
   include ::Openstack # address_for, get_password
 end
 
+#------------------------------------------------------------------------------
+# Install tacker server
+#------------------------------------------------------------------------------
+
 pyenv_dir = node['openstack-nfv-orchestration']['pyenv_dir']
 
 config_dir = File.join(pyenv_dir, 'etc/tacker')
@@ -17,10 +21,9 @@ tacker_conf_path = File.join(config_dir, 'tacker.conf')
 db_user = node['openstack']['db']['nfv-orchestration']['username']
 db_pass = get_password('db', 'tacker')
 
-#------------------------------------------------------------------------------
 tacker_system_user = 'tacker'
 tacker_system_group = 'tacker'
-
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 group tacker_system_group
 
 user tacker_system_user do
@@ -43,8 +46,7 @@ directory '/etc/tacker' do
   group tacker_system_group
   mode 0750
 end
-
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node.default['openstack']['nfv-orchestration']['conf_secrets']
 .[]('database')['connection'] =
   db_uri('nfv-orchestration', db_user, db_pass)
@@ -65,7 +67,7 @@ node.default['openstack']['nfv-orchestration']['conf'].tap do |conf|
   conf['keystone_authtoken']['auth_url'] = auth_url
 end
 
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Config file
 
 tacker_conf = merge_config_options 'nfv-orchestration'
@@ -90,7 +92,7 @@ template tacker_conf_path do
   notifies :restart, 'service[tacker-conductor]'
 end
 
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 tacker_server_version = node['openstack-nfv-orchestration']['tacker_server_version']
 
 python_runtime '2'

@@ -16,7 +16,6 @@ interfaces = {
   internal: { url: internal_endpoint('nfv-orchestration') },
   admin: { url: admin_endpoint('nfv-orchestration') },
 }
-
 auth_url = ::URI.decode identity_admin_endpoint.to_s
 service_pass = get_password 'service', 'openstack-nfv-orchestration'
 service_user =

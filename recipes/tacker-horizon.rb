@@ -5,7 +5,6 @@
 # Copyright 2017, x-ion GmbH
 
 #------------------------------------------------------------------------------
-
 pyenv_dir = node['openstack-nfv-orchestration']['pyenv_dir']
 #------------------------------------------------------------------------------
 # Install tacker-horizon
@@ -39,4 +38,3 @@ file '/usr/local/lib/python2.7/dist-packages/tacker_horizon/__init__.py' do
   mode '0644'
   content ''
 end
-#------------------------------------------------------------------------------
