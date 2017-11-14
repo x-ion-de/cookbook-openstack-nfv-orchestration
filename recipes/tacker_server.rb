@@ -79,8 +79,6 @@ end
 
 tacker_conf = merge_config_options 'nfv-orchestration'
 
-vim_conf_dir = File.join(config_dir, 'vim')
-
 directory config_dir do
   recursive true
   owner tacker_user
@@ -88,9 +86,7 @@ directory config_dir do
   mode 0700
 end
 
-# TODO: use something like config_dir for policy_file
 template tacker_conf_path do
-  #source 'tacker.conf.erb'
   source 'openstack-service.conf.erb'
   cookbook 'openstack-common'
   owner 'root'
@@ -114,8 +110,6 @@ directory pyenv_dir do
   mode 0755
 end
 
-# TODO use tacker_conf_path
-# TODO add condition
 execute 'install_tacker' do
   cwd pyenv_dir
   command "virtualenv #{pyenv_dir} --system-site-packages && . #{pyenv_dir}/bin/activate && pip install tacker==0.8.0 && pip install heat-translator && tacker-db-manage --config-file /usr/local/pyenv/tacker/etc/tacker/tacker.conf upgrade head"
@@ -124,22 +118,12 @@ execute 'install_tacker' do
   notifies :restart, 'service[mistral-api]', :immediate
   notifies :restart, 'service[mistral-engine]', :immediate
   notifies :restart, 'service[mistral-executor]', :immediate
-  # TODO don't use system-site-packages for better isolation
-  # tacker-db-manage: pymysql
-  # tacker-server: python-memcached
-  # command "virtualenv #{pyenv_dir} && . #{pyenv_dir}/bin/activate && pip install tacker==0.8.0 && pip install heat-translator && pip install pymysql && pip install python-memcached && tacker-db-manage --config-file /usr/local/pyenv/tacker/etc/tacker/tacker.conf upgrade head"
-  # TODO coordinate with tacker-client.rb if both use same pyenv
-  #creates "#{pyenv_dir}/bin/activate"
 end
 
 # Should not be necessary, already done above
 execute 'mistral-db-manage_populate' do
   command "mistral-db-manage --config-file /etc/mistral/mistral.conf populate"
 end
-
-#execute 'install_tacker' do
-#  command 'pip install tacker==0.8.0 && pip install heat-translator && tacker-db-manage --config-file /usr/local/etc/tacker/tacker.conf upgrade head'
-#end
 
 #------------------------------------------------------------------------------
 # Install systemd service file and start service
