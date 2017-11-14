@@ -9,7 +9,8 @@ default['openstack-nfv-orchestration']['tacker_server_version'] = '0.8.0'
 default['openstack-nfv-orchestration']['tacker_client_version'] = '0.10.0'
 default['openstack-nfv-orchestration']['tacker_horizon_version'] = '0.10.0'
 
-default['openstack']['nfv-orchestration']['service_role'] = 'service'
+# Needs admin for heat policy element OS::Nova::Flavor
+default['openstack']['nfv-orchestration']['service_role'] = 'admin'
 
 # ************** OpenStack NFV Orchestration Endpoints ************************
 
