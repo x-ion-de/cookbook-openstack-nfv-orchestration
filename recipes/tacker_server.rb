@@ -123,9 +123,11 @@ execute 'daemon-reload' do
   action :nothing
 end
 
+# TODO: replace policy file edits via sed with something better
+flavor_key = 'resource_types:OS::Nova::Flavor'
 execute 'Allow users in non-admin projects with admin roles to create flavors.' do
-  command 'sudo sed -i.bak \'s/"resource_types:OS::Nova::Flavor.*/"resource_types:OS::Nova::Flavor": "role:admin",/\' /etc/heat/policy.json'
-  action :nothing
+  command "sudo sed -i.bak 's|\"#{flavor_key}.*|\"#{flavor_key}\": \"role:admin\",|' /etc/heat/policy.json"
+  not_if "grep '#{flavor_key}.*role:admin' " '/etc/heat/policy.json'
 end
 
 template '/etc/systemd/system/tacker-server.service' do
