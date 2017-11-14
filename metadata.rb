@@ -17,3 +17,4 @@ depends 'openstack-workflow'
 depends 'openstack-identity', '>= 14.0.0'
 depends 'openstackclient'
 depends 'apache2', '~> 3.2'
+depends 'poise-python', '~> 1.5' # virtualenv

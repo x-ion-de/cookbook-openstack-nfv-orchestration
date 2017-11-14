@@ -6,14 +6,16 @@
 
 #------------------------------------------------------------------------------
 
-package 'python-pip'
 pyenv_dir = node['openstack-nfv-orchestration']['pyenv_dir']
 #------------------------------------------------------------------------------
 # Install tacker-horizon
+
+python_virtualenv pyenv_dir
+
 tacker_horizon_version = node['openstack-nfv-orchestration']['tacker_horizon_version']
 
-execute 'install_tacker_horizon' do
-  command "pip install tacker-horizon==#{tacker_horizon_version}"
-  creates '/usr/local/lib/python2.7/dist-packages/tacker_horizon'
+python_package 'tacker-horizon' do
+  version tacker_horizon_version
+  notifies :run, 'execute[openstack-dashboard collectstatic]'
 end
 #------------------------------------------------------------------------------
