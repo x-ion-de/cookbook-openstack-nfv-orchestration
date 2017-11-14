@@ -63,6 +63,14 @@ identity_endpoint = public_endpoint 'identity'
 
 auth_url = auth_uri_transform identity_endpoint.to_s, node['openstack']['api']['auth']['version']
 
+# tacker-server does not seem to like the settings used in other cookbooks
+# (auth_type = v3password, auth_url = http://127.0.0.1:5000/v3); with
+# auth_url = http://127.0.0.1:5000/v3, tacker doubles the path and tries to
+# post to /v3/v3/auth/tokens [sic!] for vim-register, which shows up in
+# keystone_access.log.
+# We use identity_uri_transform to remove the path (/v3) from auth_url.
+auth_url = identity_uri_transform auth_url
+
 node.default['openstack']['nfv-orchestration']['conf'].tap do |conf|
   conf['keystone_authtoken']['auth_url'] = auth_url
 end
