@@ -45,14 +45,6 @@ directory '/etc/tacker' do
 end
 
 #------------------------------------------------------------------------------
-apt_update ''
-package 'python-pip'
-package 'virtualenv'
-package 'python-dev'
-package 'libmysqlclient-dev'
-package 'libffi-dev'
-package 'libssl-dev'
-#------------------------------------------------------------------------------
 node.default['openstack']['nfv-orchestration']['conf_secrets']
 .[]('database')['connection'] =
   db_uri('nfv-orchestration', db_user, db_pass)
@@ -104,6 +96,26 @@ tacker_server_version = node['openstack-nfv-orchestration']['tacker_server_versi
 python_runtime '2'
 
 python_virtualenv pyenv_dir
+
+apt_update ''
+%w(
+  python-dev
+  libmysqlclient-dev
+  libffi-dev
+  libssl-dev
+).each do |pkg|
+  package pkg
+end
+
+# Dependencies for tacker, tacker-db-manage
+%w(
+  heat-translator
+  mysql-python
+  pymysql
+  python-memcached
+).each do |pkg|
+  python_package pkg
+end
 
 python_package 'tacker' do
   version tacker_server_version
