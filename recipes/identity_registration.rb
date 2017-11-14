@@ -11,33 +11,28 @@ class ::Chef::Recipe
 end
 
 identity_admin_endpoint = admin_endpoint 'identity'
-
-auth_url = ::URI.decode identity_admin_endpoint.to_s
-
 interfaces = {
   public: { url: public_endpoint('nfv-orchestration') },
   internal: { url: internal_endpoint('nfv-orchestration') },
   admin: { url: admin_endpoint('nfv-orchestration') },
 }
 
-admin_user = node['openstack']['identity']['admin_user']
-admin_pass = get_password 'user', admin_user
-admin_project = node['openstack']['identity']['admin_project']
-admin_domain = node['openstack']['identity']['admin_domain_name']
-
+auth_url = ::URI.decode identity_admin_endpoint.to_s
+service_pass = get_password 'service', 'openstack-nfv-orchestration'
 service_user =
   node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['username']
-
-service_pass = get_password 'service', 'openstack-nfv-orchestration'
-
+service_role = node['openstack']['nfv-orchestration']['service_role']
 service_project =
   node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['project_name']
 
 service_domain_name =
   node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['user_domain_name']
 
-service_role = node['openstack']['nfv-orchestration']['service_role']
 region = node['openstack']['region']
+admin_user = node['openstack']['identity']['admin_user']
+admin_pass = get_password 'user', admin_user
+admin_project = node['openstack']['identity']['admin_project']
+admin_domain = node['openstack']['identity']['admin_domain_name']
 
 connection_params = {
   openstack_auth_url:     "#{auth_url}/auth/tokens",
