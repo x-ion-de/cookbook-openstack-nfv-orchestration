@@ -71,8 +71,12 @@ auth_url = auth_uri_transform identity_endpoint.to_s, node['openstack']['api']['
 # We use identity_uri_transform to remove the path (/v3) from auth_url.
 auth_url = identity_uri_transform auth_url
 
+bind_service = node['openstack']['bind_service']['all']['nfv-orchestration']
+bind_service_address = bind_address bind_service
+
 node.default['openstack']['nfv-orchestration']['conf'].tap do |conf|
   conf['keystone_authtoken']['auth_url'] = auth_url
+  conf['DEFAULT']['bind_host'] = bind_service_address
 end
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
