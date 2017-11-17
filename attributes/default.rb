@@ -23,3 +23,7 @@ default['openstack']['nfv-orchestration']['service_role'] = 'admin'
   default['openstack']['endpoints'][ep_type]['nfv-orchestration']['path'] = ''
   default['openstack']['endpoints'][ep_type]['nfv-orchestration']['port'] = 9890
 end
+
+# Needed for haproxy
+default['openstack']['bind_service']['all']['nfv-orchestration']['host'] = '127.0.0.1'
+default['openstack']['bind_service']['all']['nfv-orchestration']['port'] = 9890
