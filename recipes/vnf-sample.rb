@@ -33,7 +33,8 @@ service_domain_name = node['openstack']['nfv-orchestration']['conf']['keystone_a
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Check for port_security extension in ml2_conf.ini
 execute 'check for port_security extension' do
-  command 'grep port_security /etc/neutron/plugins/ml2/ml2_conf.ini'
+  command 'grep "^extension_drivers.*port_security"' \
+          ' /etc/neutron/plugins/ml2/ml2_conf.ini'
 end
 
 execute 'echo restart neutron-server' do
