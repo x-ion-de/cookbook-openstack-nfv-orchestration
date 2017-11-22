@@ -116,13 +116,7 @@ execute 'install_tacker' do
   notifies :restart, 'service[mistral-engine]', :immediate
   notifies :restart, 'service[mistral-executor]', :immediate
 end
-#------------------------------------------------------------------------------
-# Install systemd service file and start service
-execute 'daemon-reload' do
-  command 'systemctl daemon-reload'
-  action :nothing
-end
-
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # TODO: replace policy file edits via sed with something better
 flavor_key = 'resource_types:OS::Nova::Flavor'
 execute 'Allow users in non-admin projects with admin roles to create flavors.' do
@@ -149,6 +143,11 @@ end
     notifies :run, 'execute[daemon-reload]', :immediately
     notifies :restart, "service[tacker-#{unit}]", :delayed
   end
+end
+
+execute 'daemon-reload' do
+  command 'systemctl daemon-reload'
+  action :nothing
 end
 
 service 'tacker-server' do
