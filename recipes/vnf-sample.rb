@@ -37,24 +37,6 @@ execute 'check for port_security extension' do
           ' /etc/neutron/plugins/ml2/ml2_conf.ini'
 end
 
-execute 'echo restart neutron-server' do
-  notifies :restart, 'service[neutron-server]', :immediately
-end
-
-ruby_block 'wait for neutron service' do
-  block do
-    loop do
-      # We need user password for tacker user here
-      # (openstack-chef-repo/data_bags/user_passwords/tacker.json)
-      env = openstack_command_env(service_user, service_project_name,
-                                service_domain_name, service_domain_name)
-      begin
-        break if openstack_command('openstack', 'network list', env)
-      rescue RuntimeError => e
-        Chef::Log.info("neutron still offline. Message was #{e.message}")
-      end
-    end
-  end
 end
 
 network_name = 'selfservice'
