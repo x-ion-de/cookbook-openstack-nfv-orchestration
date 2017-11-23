@@ -1,0 +1,23 @@
+# <%= @name %>
+#
+# OpenStack Tacker provides NFV orchestration
+#
+# Purpose: systemd service file (Ubuntu 16.04)
+# Location: /etc/systemd/system/<%= @name %>.service
+# Logs: journalctl -u <%= @name %>
+
+[Unit]
+Description=OpenStack Tacker <%= @name %>
+After=syslog.target network.target auditd.service
+
+[Service]
+Type=simple
+User=<%= @tacker_user %>
+Group=<%= @tacker_group %>
+ExecStart=<%= @executable %> --config-file <%= @tacker_conf_file %>
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+TimeoutSec=10
+
+[Install]
+WantedBy=multi-user.target

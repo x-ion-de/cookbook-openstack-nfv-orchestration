@@ -11,33 +11,24 @@ class ::Chef::Recipe
 end
 
 identity_admin_endpoint = admin_endpoint 'identity'
-
-auth_url = ::URI.decode identity_admin_endpoint.to_s
-
 interfaces = {
   public: { url: public_endpoint('nfv-orchestration') },
   internal: { url: internal_endpoint('nfv-orchestration') },
   admin: { url: admin_endpoint('nfv-orchestration') },
 }
+auth_url = ::URI.decode identity_admin_endpoint.to_s
+service_pass = get_password 'service', 'openstack-nfv-orchestration'
+service_user =
+  node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['username']
+service_role = node['openstack']['nfv-orchestration']['service_role']
+service_project =
+  node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['project_name']
 
+region = node['openstack']['region']
 admin_user = node['openstack']['identity']['admin_user']
 admin_pass = get_password 'user', admin_user
 admin_project = node['openstack']['identity']['admin_project']
 admin_domain = node['openstack']['identity']['admin_domain_name']
-
-service_user =
-  node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['username']
-
-service_pass = get_password 'service', 'openstack-nfv-orchestration'
-
-service_project =
-  node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['project_name']
-
-service_domain_name =
-  node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['user_domain_name']
-
-service_role = node['openstack']['nfv-orchestration']['service_role']
-region = node['openstack']['region']
 
 connection_params = {
   openstack_auth_url:     "#{auth_url}/auth/tokens",
@@ -69,10 +60,14 @@ openstack_project service_project do
   connection_params connection_params
 end
 
+advanced_services_role = 'advsvc'
+openstack_role advanced_services_role do
+  connection_params connection_params
+end
+
 # Register Service User
 openstack_user service_user do
   project_name service_project
-  role_name service_role
   password service_pass
   connection_params connection_params
 end
@@ -85,11 +80,10 @@ openstack_user service_user do
   action :grant_role
 end
 
-# Grant default domain to user with role of Service Project
+# Grant Advanced Service role to Service User for Service Project
 openstack_user service_user do
-  domain_name service_domain_name
-  role_name service_role
-  user_name service_user
+  role_name advanced_services_role
+  project_name service_project
   connection_params connection_params
-  action :grant_domain
+  action :grant_role
 end

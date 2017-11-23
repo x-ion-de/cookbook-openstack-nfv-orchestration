@@ -1,0 +1,11 @@
+# Configuration for default VIM used when optional 'cim-id' argument is
+# is not provided for 'vnf-create'.
+#
+# Created by Chef recipe openstack-nfv-orchestration::vim (<%= @version %>)
+
+auth_url: <%= @tacker_auth_url %>
+username: <%= @tacker_admin_user %>
+password: <%= @tacker_admin_pass %>
+project_name: service
+project_domain_name: Default
+user_domain_name: Default
