@@ -37,6 +37,13 @@ execute 'check for port_security extension' do
           ' /etc/neutron/plugins/ml2/ml2_conf.ini'
 end
 
+# Restart services in kitchen to avoid having to run the scripts twice
+bash 'restart_services' do
+  code <<-EOH
+    systemctl restart nova-compute.service
+    systemctl restart neutron-dhcp-agent.service
+  EOH
+  only_if { node.chef_environment == '_default' }
 end
 
 network_name = 'selfservice'
@@ -84,14 +91,6 @@ ruby_block 'create private subnet' do
       false
     end
   end
-end
-
-execute 'echo restart nova-compute' do
-  notifies :restart, 'service[nova-compute]', :immediately
-end
-
-execute 'echo restart nova-compute' do
-  notifies :restart, 'service[neutron-dhcp-agent]', :immediately
 end
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ruby_block 'create vnf' do
