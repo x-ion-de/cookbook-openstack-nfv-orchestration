@@ -73,8 +73,9 @@ ruby_block 'create private network' do
                                 service_domain_name, service_domain_name)
     begin
       openstack_command('openstack', ['network', 'show', network_name], env)
+      puts "Network #{network_name} does already exist."
     rescue RuntimeError => e
-      Chef::Log.info("Network does not exist yet. Message was #{e.message}")
+      Chef::Log.info("Cannot show network #{network_name}. Message was #{e.message}")
       false
     end
   end
@@ -97,7 +98,7 @@ ruby_block 'create private subnet' do
     begin
       openstack_command('openstack', ['subnet', 'show', subnet_name], env)
     rescue RuntimeError => e
-      Chef::Log.info("Subnet does not exist yet. Message was #{e.message}")
+      Chef::Log.info("Cannot show subnet #{subnet_name}. Message was #{e.message}")
       false
     end
   end
