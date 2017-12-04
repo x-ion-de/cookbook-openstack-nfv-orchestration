@@ -33,8 +33,8 @@ tackerclient = if File.file?("#{pyenv_dir}/bin/tacker")
 identity_public_endpoint = public_endpoint 'identity'
 public_auth_url = ::URI.decode identity_public_endpoint.to_s
 
-service_pass = get_password 'service', 'openstack-nfv-orchestration'
-service_user = node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['username']
+demo_pass = get_password 'user', 'nfvdemo'
+demo_user = 'nfvdemo'
 service_project_name = node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['project_name']
 service_domain_name = node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['user_domain_name']
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -50,8 +50,8 @@ template vim_conf_path do
   group 'root'
   mode 0644
   variables(
-    tacker_admin_user: service_user,
-    tacker_admin_pass: service_pass,
+    tacker_admin_user: demo_user,
+    tacker_admin_pass: demo_pass,
     tacker_auth_url: public_auth_url,
     version: run_context.cookbook_collection['openstack-nfv-orchestration'].metadata.version
   )
@@ -60,7 +60,7 @@ end
 ruby_block 'wait for tacker service' do
   block do
     begin
-      env = openstack_command_env(service_user, service_project_name,
+      env = openstack_command_env(demo_user, service_project_name,
                                   service_domain_name, service_domain_name)
       sleep 1 until openstack_command(tackerclient, 'vim-list', env)
       # We need user password for tacker user here
@@ -71,7 +71,7 @@ end
 
 ruby_block 'create vim' do
   block do
-    env = openstack_command_env(service_user, service_project_name,
+    env = openstack_command_env(demo_user, service_project_name,
                                 service_domain_name, service_domain_name)
     # We need user password for tacker user here
     # (openstack-chef-repo/data_bags/user_passwords/tacker.json)
@@ -83,7 +83,7 @@ ruby_block 'create vim' do
   end
   not_if do
     # Check if a default vim already exists
-    env = openstack_command_env(service_user, service_project_name,
+    env = openstack_command_env(demo_user, service_project_name,
                                 service_domain_name, service_domain_name)
     openstack_command(tackerclient, ['vim-list', '-cis_default', '-fvalue'], env).chomp == 'True'
   end
@@ -92,7 +92,7 @@ end
 ruby_block 'wait for vim' do
   block do
     begin
-      env = openstack_command_env(service_user, service_project_name,
+      env = openstack_command_env(demo_user, service_project_name,
                                   service_domain_name, service_domain_name)
       until openstack_command(tackerclient,
                               ['vim-show', vim_name, '-cstatus', '-fvalue'],

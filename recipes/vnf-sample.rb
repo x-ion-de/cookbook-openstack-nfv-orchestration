@@ -27,8 +27,8 @@ tackerclient = if File.file?("#{pyenv_dir}/bin/tacker")
                  '/usr/bin/tacker'
                end
 
-service_user = node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['username']
-service_project_name = node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['project_name']
+demo_user = 'nfvdemo'
+demo_project = 'service'
 service_domain_name = node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['user_domain_name']
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Check for port_security extension in ml2_conf.ini
@@ -51,14 +51,14 @@ subnet_name = 'selfservice'
 
 ruby_block 'create private network' do
   block do
-    env = openstack_command_env(service_user, service_project_name,
+    env = openstack_command_env(demo_user, demo_project,
                                 service_domain_name, service_domain_name)
     openstack_command('openstack', ['network', 'create', network_name], env)
   end
   not_if do
     # Check if network already exists (note: test wrong if more than
     # one network with the chosen name already exist)
-    env = openstack_command_env(service_user, service_project_name,
+    env = openstack_command_env(demo_user, demo_project,
                                 service_domain_name, service_domain_name)
     begin
       openstack_command('openstack', ['network', 'show', network_name], env)
@@ -72,7 +72,7 @@ end
 
 ruby_block 'create private subnet' do
   block do
-    env = openstack_command_env(service_user, service_project_name,
+    env = openstack_command_env(demo_user, demo_project,
                                   service_domain_name, service_domain_name)
     openstack_command('openstack', ['subnet', 'create',
                                     '--network', network_name,
@@ -82,7 +82,7 @@ ruby_block 'create private subnet' do
   not_if do
     # Check if subnet already exists (note: test wrong if more than
     # one subnet with the chosen name already exist)
-    env = openstack_command_env(service_user, service_project_name,
+    env = openstack_command_env(demo_user, demo_project,
                                 service_domain_name, service_domain_name)
     begin
       openstack_command('openstack', ['subnet', 'show', subnet_name], env)
@@ -95,7 +95,7 @@ end
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ruby_block 'create vnf' do
   block do
-    env = openstack_command_env(service_user, service_project_name,
+    env = openstack_command_env(demo_user, demo_project,
                                  service_domain_name, service_domain_name)
     vnfd_id = openstack_command(tackerclient,
                                ['vnfd-show', vnfd_name,
@@ -107,7 +107,7 @@ ruby_block 'create vnf' do
   not_if do
     # Check if subnet already exists (note: test wrong if more than
     # one subnet with the chosen name already exist)
-    env = openstack_command_env(service_user, service_project_name,
+    env = openstack_command_env(demo_user, demo_project,
                                 service_domain_name, service_domain_name)
     begin
       openstack_command(tackerclient, ['vnf-show', vnf_name], env)
@@ -121,7 +121,7 @@ end
 ruby_block 'wait for vnf to become active' do
   block do
     loop do
-      env = openstack_command_env(service_user, service_project_name,
+      env = openstack_command_env(demo_user, demo_project,
                                 service_domain_name, service_domain_name)
       begin
         break if openstack_command(tackerclient,
