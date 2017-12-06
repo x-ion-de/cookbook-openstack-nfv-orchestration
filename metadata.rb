@@ -4,7 +4,7 @@ maintainer_email 'r.luethi@x-ion.de'
 license 'Apache 2.0'
 description 'Installs/Configures OpenStack Tacker'
 long_description 'Installs/Configures OpenStack Tacker'
-version '0.1.0'
+version '0.1.1'
 supports         'ubuntu'
 chef_version '>= 12.1' if respond_to?(:chef_version)
 issues_url       'https://github.com/x-ion-de/cookbook-openstack-nfv-orchestration/issues'
