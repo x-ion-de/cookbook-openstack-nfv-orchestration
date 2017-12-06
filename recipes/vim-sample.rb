@@ -48,7 +48,7 @@ end
 template vim_conf_path do
   owner 'root'
   group 'root'
-  mode 0644
+  mode 0600
   variables(
     tacker_admin_user: demo_user,
     tacker_admin_pass: demo_pass,
