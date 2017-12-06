@@ -3,11 +3,11 @@ default['openstack']['common']['services']['nfv-orchestration'] = 'tacker'
 
 default['openstack']['nfv-orchestration']['syslog']['use'] = false
 
-# Versions for OpenStack release: Pike
+# Versions for OpenStack release: Ocata
 # https://releases.openstack.org/teams/tacker.html
-default['openstack-nfv-orchestration']['tacker_server_version'] = '0.8.0'
-default['openstack-nfv-orchestration']['tacker_client_version'] = '0.10.0'
-default['openstack-nfv-orchestration']['tacker_horizon_version'] = '0.10.0'
+default['openstack-nfv-orchestration']['tacker_server_version'] = '0.7.0'
+default['openstack-nfv-orchestration']['tacker_client_version'] = '0.9.0'
+default['openstack-nfv-orchestration']['tacker_horizon_version'] = '0.8.0'
 
 default['openstack-nfv-orchestration']['pyenv_dir'] = '/usr/local/pyenv/tacker'
 
