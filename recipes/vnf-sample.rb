@@ -49,25 +49,13 @@ end
 network_name = 'selfservice'
 subnet_name = 'selfservice'
 
-ruby_block 'create private network' do
-  block do
-    env = openstack_command_env(demo_user, demo_project,
-                                service_domain_name, service_domain_name)
-    openstack_command('openstack', ['network', 'create', network_name], env)
-  end
-  not_if do
-    # Check if network already exists (note: test wrong if more than
-    # one network with the chosen name already exist)
-    env = openstack_command_env(demo_user, demo_project,
-                                service_domain_name, service_domain_name)
-    begin
-      openstack_command('openstack', ['network', 'show', network_name], env)
-      puts "Network #{network_name} does already exist."
-    rescue RuntimeError => e
-      Chef::Log.info("Cannot show network #{network_name}. Message was #{e.message}")
-      false
-    end
-  end
+bash 'create private network' do
+  code <<-EOH
+    source /root/openrc
+    if ! openstack network list -cName -fvalue | grep '^#{network_name}$'; then
+      openstack network create "#{network_name}"
+    fi
+  EOH
 end
 
 ruby_block 'create private subnet' do
