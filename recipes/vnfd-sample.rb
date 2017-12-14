@@ -30,8 +30,8 @@ tackerclient = if File.file?("#{pyenv_dir}/bin/tacker")
                  '/usr/bin/tacker'
                end
 
-service_user = node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['username']
-service_project_name = node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['project_name']
+demo_user = 'nfvdemo'
+demo_project = 'service'
 service_domain_name = node['openstack']['nfv-orchestration']['conf']['keystone_authtoken']['user_domain_name']
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 directory config_dir do
@@ -52,7 +52,7 @@ end
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ruby_block 'create vnfd' do
   block do
-    env = openstack_command_env(service_user, service_project_name,
+    env = openstack_command_env(demo_user, demo_project,
                                 service_domain_name, service_domain_name)
     # We need user password for tacker user here
     # (openstack-chef-repo/data_bags/user_passwords/tacker.json)
@@ -62,7 +62,7 @@ ruby_block 'create vnfd' do
   end
   not_if do
     # Check if a vnfd already exists
-    env = openstack_command_env(service_user, service_project_name,
+    env = openstack_command_env(demo_user, demo_project,
                                 service_domain_name, service_domain_name)
     begin
       openstack_command(tackerclient, ['vnfd-show', vnfd_name], env)
@@ -75,7 +75,7 @@ end
 
 ruby_block 'wait for vnfd onboarding' do
   block do
-    env = openstack_command_env(service_user, service_project_name,
+    env = openstack_command_env(demo_user, demo_project,
                               service_domain_name, service_domain_name)
     sleep 1 until openstack_command(tackerclient,
                                     ['vnfd-show', vnfd_name,
